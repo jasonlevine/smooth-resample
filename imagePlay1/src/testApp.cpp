@@ -51,14 +51,31 @@ void testApp::draw(){
             green /= (w * h);
             blue /= (w * h);
             
-            ofSetColor(red, 0, 0);
-            ofRect(x, y, w/3, h);
+//            ofSetColor(red, 0, 0);
+//            ofRect(x, y, w/3, h);
+//            
+//            ofSetColor(0, green, 0);
+//            ofRect(x+w/3, y, w/3, h);
+//            
+//            ofSetColor(0, 0, blue);
+//            ofRect(x+(w/3*2), y, w/3, h);
             
-            ofSetColor(0, green, 0);
-            ofRect(x+w/3, y, w/3, h);
+            ofSetColor(red, green, 0);
+            ofRect(x, y, w, h);
             
-            ofSetColor(0, 0, blue);
-            ofRect(x+(w/3*2), y, w/3, h);
+           
+            ofPushMatrix();
+            ofTranslate(x + w/2, y + h);
+            ofRotateZ((int)(i*j + ofGetElapsedTimef() * 50) % 360);
+            ofTranslate(-(x + w/2), -(y + h));
+            ofSetColor(red, 0, blue);
+            ofTriangle(x + w/2, y, x, y + h, x + w, y + h);
+            ofPopMatrix();
+            
+            ofSetColor(0, green, blue);
+            ofCircle(x + w/2, y+ h/2, (w + h) / 8);
+    
+            
             
             
 //            int index = (yPix * img.getWidth() + xPix) * 3;
