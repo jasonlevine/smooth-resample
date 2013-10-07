@@ -3,8 +3,8 @@
 //--------------------------------------------------------------
 void testApp::setup(){
     img.loadImage("SALVADOR-DALI-010.jpg");
-    rows = 100;
-    cols = 100;
+    rows = 20;
+    cols = 20;
     ofFill();
 }
 
@@ -51,8 +51,14 @@ void testApp::draw(){
             green /= (w * h);
             blue /= (w * h);
             
-            ofSetColor(red, green, blue);
-            ofRect(x, y, w, h);
+            ofSetColor(red, 0, 0);
+            ofRect(x, y, w/3, h);
+            
+            ofSetColor(0, green, 0);
+            ofRect(x+w/3, y, w/3, h);
+            
+            ofSetColor(0, 0, blue);
+            ofRect(x+(w/3*2), y, w/3, h);
             
             
 //            int index = (yPix * img.getWidth() + xPix) * 3;
