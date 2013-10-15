@@ -19,10 +19,11 @@ public:
     void update();
     void draw();
     
-//    int getPixelIndex(int x, int y, int width) { return y * width * 3 + x * 3; };
+    int getPixelIndex(int x, int y, int width) { return y * width * 3 + x * 3; };
 //    ofColor getColorAt(int index, unsigned char * pixels) { return ofColor(pixels[index], pixels[index+1], pixels[index+2]); };
     
     ofColor getColorAt(int x, int y, ofImage &img);
+    void generateImage(int x, int y);
 
     void keyPressed(int key);
     void keyReleased(int key);
@@ -37,7 +38,7 @@ public:
     ofImage source;
     ofImage target;
     
-    map< ofColor, map < ofColor, int > > colorStats;
+    map< ofColor, map < ofColor, float > > colorStats;
     
     int colorIndex;
     

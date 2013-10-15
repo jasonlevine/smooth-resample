@@ -48,56 +48,52 @@ void testApp::setup(){
                 }
             }
             
-            /*
-            bool colorFound = false;
-            int i = 0;
-            while ( i < colorStats.size() && colorFound == false ) {
-                cout << "Main color = " << ofToString(mainColor) << "colorStats[i].color = " << ofToString(colorStats[i].color) << endl;
-                if (mainColor == colorStats[i].color) colorFound = true;
-                if (!colorFound) i++;
-            }
-            
-            if (colorFound) {
-                int numRatios = colorStats[i].ratios.size();
-                for (int n = 0; n < neighbours.size(); n++) {
-                    for (int r = 0; r < numRatios; r++) {
-                        if ( neighbours[n] == colorStats[i].ratios[r].color ) {
-                            colorStats[i].ratios[r].pct++;
-                        }
-                        else {
-                            colorRatio tempRatio;
-                            tempRatio.color = neighbours[n];
-                            tempRatio.pct = 1;
-                            colorStats[i].ratios.push_back(tempRatio);
-                            cout << "colorStats[" << i << "].ratios.size() = " << colorStats[i].ratios.size() << endl << "numRatios=" << numRatios << endl << endl;
-                        }
-                    }
-                }
-            }
-            else {
-                colorInfo tempInfo;
-                tempInfo.color = mainColor;
-                for (int n = 0; n < neighbours.size(); n++) {
-                    colorRatio tempRatio;
-                    tempRatio.color = neighbours[n];
-                    tempRatio.pct = 1;
-                    tempInfo.ratios.push_back(tempRatio);
-                }
-                colorStats.push_back(tempInfo);
-            }*/
         }
     }
-    cout << "colorStats " << colorStats.size() << endl << "numPixels " << source.getWidth() * source.getHeight() ;
     
-    map<ofColor, map < ofColor, int > >::iterator mainColor = colorStats.begin();
-    mainColor++;
-    for(map < ofColor, int >::iterator subColor=mainColor->second.begin();
-        subColor!=mainColor->second.end(); ++subColor){
-        cout << (*subColor).first << "  " << (*subColor).second << endl;
+//    cout << "colorStats " << colorStats.size() << endl << "numPixels " << source.getWidth() * source.getHeight() << endl;
+    int numEmpty = 0;
+    
+    for(map<ofColor, map < ofColor, float > >::iterator mainColor = colorStats.begin(); mainColor!=colorStats.end(); ++mainColor){
+        
+        cout << (*mainColor).second.size() << endl;
+        
+        float totalOccurences = 0;
+        for(map < ofColor, float >::iterator subColor = mainColor->second.begin();
+            subColor!=mainColor->second.end(); ++subColor){
+            totalOccurences += (*subColor).second;
+        }
+        
+        for(map < ofColor, float >::iterator subColor = mainColor->second.begin();
+            subColor!=mainColor->second.end(); ++subColor){
+            (*subColor).second /= totalOccurences;
+        }
+        
+        float lastVal = 0;
+        for(map < ofColor, float >::iterator subColor = mainColor->second.begin();
+            subColor!=mainColor->second.end(); ++subColor){
+            (*subColor).second += lastVal;
+            lastVal = (*subColor).second;
+        }
+        
+        
+
+    }
+    
+//    cout << "numEmpty = " << numEmpty << endl;
+    ofColor mainColor(0, 21, 40);
+   for(map < ofColor, float >::iterator subColor = colorStats[mainColor].begin(); subColor!=colorStats[mainColor].end(); ++subColor){
+//        cout << (*subColor).first << "  " << (*subColor).second << endl;
     }
     
     colorIndex = 0;
     setupComplete = true;
+    
+//    cout << "color 144, 89, 0 ->" << endl;
+//    for(map < ofColor, float >::iterator subColor = colorStats[ofColor(3,3,3)].begin();
+//        subColor!=colorStats[ofColor(144, 89, 0)].end(); ++subColor){
+//        cout << (*subColor).first << " " << (*subColor).second << endl;
+//    }
 }
 
 //--------------------------------------------------------------
@@ -107,13 +103,10 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+    source.draw(0,0);
+//    target.update();
+    target.draw(source.getWidth(), 0);
 
-    
-    
-//    for ( subColor = mainColor-> .begin();
-//         mainColor != colorStats.end();  // say let's stop when we get to the end aMap
-//         ++it) {            // increment the iterator
-//    }
 }
 
 //--------------------------------------------------------------
@@ -127,16 +120,91 @@ ofColor testApp::getColorAt(int x, int y, ofImage &img) {
 
 
 //--------------------------------------------------------------
-void testApp::keyPressed(int key){
-    if ( key == OF_KEY_LEFT ) {
-        colorIndex--;
-        if (colorIndex < 0) colorIndex = 0;
+void testApp::generateImage(int xPos, int yPos){
+    
+    unsigned char * srcPixels = source.getPixels();
+    unsigned char * tgtPixels = target.getPixels();
+    
+    // assign edges of source image to target to avoid edge cases
+    /*for (int x = 0; x < source.getWidth(); x++) {
+        int index = getPixelIndex(x, 0, source.getWidth());
+        tgtPixels[index] = srcPixels[index];
+        tgtPixels[index+1] = srcPixels[index+1];
+        tgtPixels[index+2] = srcPixels[index+2];
+        
+        index = getPixelIndex(x, source.getHeight()-1, source.getWidth());
+        tgtPixels[index] = srcPixels[index];
+        tgtPixels[index+1] = srcPixels[index+1];
+        tgtPixels[index+2] = srcPixels[index+2];
     }
     
-    if ( key == OF_KEY_RIGHT) {
-        colorIndex++;
-        if (colorIndex > colorStats.size()-1) colorIndex = colorStats.size()-1;
+    for (int y = 1; y < source.getHeight()-1; y++) {
+        int index = getPixelIndex(0, y, source.getWidth());
+        tgtPixels[index] = srcPixels[index];
+        tgtPixels[index+1] = srcPixels[index+1];
+        tgtPixels[index+2] = srcPixels[index+2];
+        
+        index = getPixelIndex(source.getHeight(), y, source.getWidth());
+        tgtPixels[index] = srcPixels[index];
+        tgtPixels[index+1] = srcPixels[index+1];
+        tgtPixels[index+2] = srcPixels[index+2];
+    }*/
+    
+    
+    
+    int index = getPixelIndex(xPos, yPos, source.getWidth());
+    ofColor mainColor(srcPixels[index], srcPixels[index+1], srcPixels[index+2]);
+    ofColor selectedColor(0,0,0);
+    
+    
+    for (int y = 0; y < target.getHeight(); y++) {
+        for (int x = 0; x < target.getWidth(); x++) {
+
+//            bool colorFits = false;
+//            while (!colorFits) {
+            
+                float diceRoll = ofRandomf();
+                bool colorFound = false;
+            
+                
+                for(map < ofColor, float >::iterator subColor = colorStats[mainColor].begin(); subColor!=colorStats[mainColor].end(); ++subColor){
+                    
+                    if ( (*subColor).second > diceRoll && !colorFound) {
+                        selectedColor = (*subColor--).first;
+                        colorFound = true;
+                        int index = y * target.getWidth() * 3 + x * 3;
+                        tgtPixels[index] = selectedColor.r;
+                        tgtPixels[index+1] = selectedColor.g;
+                        tgtPixels[index+2] = selectedColor.b;
+                    }
+                }
+                
+            mainColor = selectedColor;
+            
+//                if ( selectedColor) {
+//                    int index = y * target.getWidth() * 3 + x * 3;
+//                    tgtPixels[index] = selectedColor.r;
+//                    tgtPixels[index+1] = selectedColor.g;
+//                    tgtPixels[index+2] = selectedColor.b;
+//                    colorFits = true;
+//                }
+//            }
+            
+        }
+        cout << "y " << y << "mainColor " << mainColor << endl;
+        
     }
+    
+    target.update();
+    
+}
+
+
+//--------------------------------------------------------------
+void testApp::keyPressed(int key){
+
+    
+//    if (key == 'g') generateImage();
     
 }
 
@@ -157,7 +225,9 @@ void testApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-
+    if ( x < source.getWidth() && y < source.getHeight() ) {
+        generateImage(x, y);
+    }
 }
 
 //--------------------------------------------------------------
