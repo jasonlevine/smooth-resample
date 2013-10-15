@@ -37,7 +37,7 @@ public:
     ofImage source;
     ofImage target;
     
-    vector<colorInfo> colorStats;
+    map< ofColor, map < ofColor, int > > colorStats;
     
     int colorIndex;
     

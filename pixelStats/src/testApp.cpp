@@ -9,7 +9,7 @@ void testApp::setup(){
     int w = source.getWidth();
     int h = source.getHeight();
     
-
+    bool colah = ofColor(0,0,0) < ofColor(0,1,0);
     
     target.allocate(w, h, OF_IMAGE_COLOR);
     
@@ -31,6 +31,24 @@ void testApp::setup(){
             neighbours.push_back(getColorAt(x, y + 1, source));
             neighbours.push_back(getColorAt(x + 1, y + 1, source));
             
+            
+            if (colorStats.find(mainColor) != colorStats.end()) {
+                for (int n = 0; n < neighbours.size(); n++) {
+                    if (colorStats[mainColor].find(neighbours[n]) != colorStats[mainColor].end()) {
+                        colorStats[mainColor][neighbours[n]]++;
+                    }
+                    else {
+                        colorStats[mainColor][neighbours[n]] = 1;
+                    }
+                }
+            }
+            else {
+                for (int n = 0; n < neighbours.size(); n++) {
+                    colorStats[mainColor][neighbours[n]] = 1;
+                }
+            }
+            
+            /*
             bool colorFound = false;
             int i = 0;
             while ( i < colorStats.size() && colorFound == false ) {
@@ -66,10 +84,18 @@ void testApp::setup(){
                     tempInfo.ratios.push_back(tempRatio);
                 }
                 colorStats.push_back(tempInfo);
-            }
+            }*/
         }
     }
-
+    cout << "colorStats " << colorStats.size() << endl << "numPixels " << source.getWidth() * source.getHeight() ;
+    
+    map<ofColor, map < ofColor, int > >::iterator mainColor = colorStats.begin();
+    mainColor++;
+    for(map < ofColor, int >::iterator subColor=mainColor->second.begin();
+        subColor!=mainColor->second.end(); ++subColor){
+        cout << (*subColor).first << "  " << (*subColor).second << endl;
+    }
+    
     colorIndex = 0;
     setupComplete = true;
 }
@@ -81,22 +107,13 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-    if (setupComplete) {
-        ofSetRectMode(OF_RECTMODE_CORNER);
-        source.draw(0,0);
-        ofSetRectMode(OF_RECTMODE_CENTER);
-        ofSetColor(colorStats[colorIndex].color);
-        ofRect(ofGetWidth()/2, 100, 200, 200);
-        
-        for (int r = 0; r < colorStats[colorIndex].ratios.size(); r++) {
-            ofSetColor(colorStats[colorIndex].ratios[r].color);
-            int size = ofGetWidth()/colorStats[colorIndex].ratios.size();
-            ofRect(r * size + size/2, 400, size, size);
-            ofSetColor(255);
-            ofDrawBitmapString(ofToString(colorStats[colorIndex].ratios[r].pct), r * size + size/2, 410 + size);
-        }
-    }
+
     
+    
+//    for ( subColor = mainColor-> .begin();
+//         mainColor != colorStats.end();  // say let's stop when we get to the end aMap
+//         ++it) {            // increment the iterator
+//    }
 }
 
 //--------------------------------------------------------------
